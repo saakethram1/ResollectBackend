@@ -13,6 +13,9 @@ def first_api(request):
 
 @api_view(['GET', 'POST'])
 def items_list(request):
+
+    string_fields = ['borrower', 'co_borrower_name', 'region', 'state', 'category', 'loan_type', 'borrower_address', 'co_borrower_address']
+
     if request.method == 'GET':
         try:
             filters = request.query_params.dict()
@@ -27,6 +30,8 @@ def items_list(request):
                         queryset = queryset.filter(**{field: value})
                     elif field.endswith('__icontains'):
                         queryset = queryset.filter(**{field: value})
+                    elif field in string_fields:
+                        queryset = queryset.filter(**{f"{field}__icontains": value})
                     else:
                         queryset = queryset.filter(**{field: value})
 
