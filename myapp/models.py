@@ -1,7 +1,7 @@
 from django.db import models
 
 class Loan(models.Model):
-  loan_no = models.IntegerField(default=0)
+  loan_no = models.IntegerField(default=0,unique=True)
   category = models.CharField(max_length=100)
   loan_type = models.CharField(max_length=100)
   borrower = models.CharField(max_length=100)
