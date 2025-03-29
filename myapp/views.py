@@ -94,7 +94,13 @@ from .serializers import LoanSerializer
 def loan_operations(request, loan_no):
     try:
         # Get the loan object or return 404
-        loan = get_object_or_404(Loan, loan_no=loan_no)
+        loan = Loan.objects.filter(loan_no=loan_no)
+
+        if not loan.exists():
+            return Response({
+                'success': False,
+                'message': f'No loan found with loan_no: {loan_no}'
+            }, status=status.HTTP_404_NOT_FOUND)
         
         # Handle GET request (retrieve)
         if request.method == 'GET':
