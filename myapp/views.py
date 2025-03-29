@@ -93,14 +93,15 @@ from .serializers import LoanSerializer
 @api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
 def loan_operations(request, loan_no):
     try:
-        # Get the loan object or return 404
-        loan = Loan.objects.filter(loan_no=loan_no)
-
-        if not loan.exists():
+        
+        try:
+            loan = Loan.objects.get(loan_no=loan_no)
+        except Loan.DoesNotExist:
             return Response({
                 'success': False,
                 'message': f'No loan found with loan_no: {loan_no}'
             }, status=status.HTTP_404_NOT_FOUND)
+
         
         # Handle GET request (retrieve)
         if request.method == 'GET':
