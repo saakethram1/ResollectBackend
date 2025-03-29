@@ -94,7 +94,7 @@ from .serializers import LoanSerializer
 def loan_operations(request, loan_no):
     try:
         loan = Loan.objects.filter(loan_no=loan_no)
-        if not loans.exists():
+        if not loan.exists():
             return Response({
         'success': False,
         'message': f'No loans found with loan_no: {loan_no}'
