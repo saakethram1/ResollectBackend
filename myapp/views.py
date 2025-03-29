@@ -14,11 +14,10 @@ def first_api(request):
 @api_view(['GET', 'POST'])
 def items_list(request):
     if request.method == 'GET':
-        # Your existing loan_list code
         try:
             filters = request.query_params.dict()
             queryset = Loan.objects.all()
-            
+
             valid_fields = [f.name for f in Loan._meta.get_fields()]
             for field, value in filters.items():
                 if field in valid_fields and value not in [None, '']:
@@ -41,7 +40,7 @@ def items_list(request):
                 loans = paginator.page(1)
             except EmptyPage:
                 loans = paginator.page(paginator.num_pages)
-            
+
             serializer = LoanSerializer(loans, many=True)
             return Response({
                 'success': True,
@@ -51,21 +50,35 @@ def items_list(request):
                 'total_pages': paginator.num_pages,
                 'results': serializer.data
             })
+
         except Exception as e:
             return Response({
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'POST':
-        # Your existing create_loan code
-        serializer = LoanSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from rest_framework.decorators import api_view
+    elif request.method == 'POST':
+        try:
+            loan_no = request.data.get('loan_no')
+            if Loan.objects.filter(loan_no=loan_no).exists():
+                return Response(
+                    {"error": "Loan with this loan_no already exists."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            serializer = LoanSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
