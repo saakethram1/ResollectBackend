@@ -94,7 +94,8 @@ from .serializers import LoanSerializer
 def loan_operations(request, loan_no):
     try:
         try:
-            loan = Loan.objects.get(loan_no=loan_no)
+            loan =get_object_or_404(Loan, loan_no=loan_no)
+        
         except Loan.DoesNotExist:
             return Response({
                 'success': False,
